@@ -3,31 +3,28 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        while (true) {
+        boolean x = true;
+        while (x) {
             String inputStr; // для чисел арабский и римских
-            Integer result = 0;
             Scanner scanner = new Scanner(System.in);
             System.out.println("Введите выражение. Принимаются числа от 1 до 10 включительно, либо римские от I до X включительно: ");
             inputStr = scanner.nextLine();
-            result = calc(inputStr); // отправляем строку на проверку
-            if (result != -1)
-                System.out.println("Результат вычисления = " + result);
-            else
+            if (calc(inputStr) == -1) // отправляем строку на подсчет
                 break;
         }
         System.out.println("Программа завершила работу");
     }
 
-    private static Integer calc(String string) { // string = "цуйцу 10 + 1 цйуцйуйцу IV + I" "gfd + sd"
-        Integer result = -1;
+    private static Integer calc(String string) { // string = "10 + 1" "IV + I"
+        Integer result = -1; // для ошибки
         String firstNumber, secondNumber, operation;
         String[] str = string.split(" "); // так введенная строка попадет в массив
         firstNumber = str[0]; // в этой переменной будет лежать "III" или 3
         operation = str[1]; // в этой переменной будет лежать лог операция
         secondNumber = str[2]; // в этой переменной будет лежать "IV" или 4
 
-        Data firstData  = new Data(), secondData = new Data();
-        firstData = parseArab(firstNumber); // пробуем спарсить первое число
+        Data firstData, secondData;
+        firstData = parseData(firstNumber); // пробуем спарсить первое число
         if (firstData.getCode().equals(Data.CODE_ERROR)) { // если не найдено число
             System.out.println("Ошибка не найдено число");
             return result; // возвращаем результат -1
@@ -37,7 +34,7 @@ public class Main {
                 return result; // возвращаем результат -1
             }
         }
-        secondData  = parseArab(secondNumber); // пробуем спарсить второе число
+        secondData = parseData(secondNumber); // пробуем спарсить второе число
         if (secondData.getCode().equals(Data.CODE_ERROR)) { // если не найдено число
             System.out.println("Ошибка не найдено число");
             return result; // возвращаем результат -1
@@ -48,13 +45,15 @@ public class Main {
             }
         }
 
-        if ((firstData.getCode().equals(Data.CODE_ARAB) && secondData.getCode().equals(Data.CODE_ARAB)) ||
-                (firstData.getCode().equals(Data.CODE_RIM) && secondData.getCode().equals(Data.CODE_RIM))) {
+        boolean allNumbersArab = (firstData.getCode().equals(Data.CODE_ARAB) && secondData.getCode().equals(Data.CODE_ARAB));
+        boolean allNumbersRim = (firstData.getCode().equals(Data.CODE_RIM) && secondData.getCode().equals(Data.CODE_RIM));
+
+        if (allNumbersArab || allNumbersRim) {
             if (Objects.equals(operation, "+")) {
                 result = firstData.getResult() + secondData.getResult();
             } else if (Objects.equals(operation, "-")) {
                 result = firstData.getResult() - secondData.getResult();
-                if (firstData.getCode().equals(Data.CODE_RIM) && secondData.getCode().equals(Data.CODE_RIM)) {
+                if (allNumbersRim) { // если оба числа римских
                     if (result < 1) {
                         System.out.println("Ошибка. Были введены римские числа и результат вычислений меньше 1");
                         result = -1;
@@ -65,9 +64,14 @@ public class Main {
             } else if (Objects.equals(operation, "*")) {
                 result = firstData.getResult() * secondData.getResult();
             }
+
         } else {
             System.out.println("Ошибка были введены числа арабское и римское");
         }
+        if (allNumbersRim)
+            System.out.println("Результат вычисления = " + arabToRim(result));
+        else
+            System.out.println("Результат вычисления = " + result);
         return result;
     }
 
@@ -75,16 +79,14 @@ public class Main {
         return (number > 0 && number <= 10);
     }
 
-    private static Data parseArab(String inputStr) {
+    private static Data parseData(String inputStr) {
         Data result = new Data();
         result.setCode(Data.CODE_ERROR);
         Integer number;
         try {
             number = Integer.parseInt(inputStr); // пробуем получить из строки арабское число
-           // if (number > 0 && number <= 10) { // если подходит по условию от 0 до 10 включительно
             result.setResult(number); // присваиваем результат число
             result.setCode(Data.CODE_ARAB); // присваиваем код - арабское число
-           // }
         } catch (NumberFormatException e) { // если получено исключение при парсинге строки
             number = parseRimNumber(inputStr); // пробуем получить арабское число из римских символов
             if (number != -1) { // если нашли римское число
@@ -93,6 +95,12 @@ public class Main {
             }
         }
         return result; // если удалось получить арабское число оно будет возвращено
+    }
+
+    private static String arabToRim(Integer i) {
+        String[] rimNumbers = {
+                "0", " I ", " II ", " III ", " IV ", " V ", " VI ", " VII ", " VIII ", " IX ", " X ", " XI ", " XII ", " XIII ", " XIV ", " XV ", " XVI ", " XVII ", " XVIII ", " XIX ", " XX ", " XXI ", " XXII ", " XXIII ", " XXIV ", " XXV ", " XXVI ", " XXVII ", " XXVIII ", " XXIX ", " XXX ", " XXXI ", " XXXII ", " XXXIII ", " XXXIV ", " XXXV ", " XXXVI ", " XXXVII ", " XXXVIII ", " XXXIX ", " XL ", " XLI ", " XLII ", " XLIII ", " XLIV ", " XLV ", " XLVI ", " XLVII ", " XLVIII ", " XLIX ", " L ", " LII ", " LIII ", " LIV ", " LV ", " LVI ", " LVII ", " LVIII ", " LIX ", " LX ", " LXI ", " LXII ", " LXIII ", " LXIV ", " LXV ", " LXVI ", " LXVII ", " LXVIII ", " LXIX ", " LXX ", " LXXI ", " LXXII ", " LXXIII ", " LXXIV ", " LXXV ", " LXXVI ", " LXXVII ", " LXXVIII ", " LXXIX ", " LXXX ", " LXXXI ", " LXXXII ", " LXXXIII ", " LXXXIV ", " LXXXV ", " LXXXVI ", " LXXXVII ", " LXXXVIII ", " LXXXIX ", " XC ", " XCI ", " XCII ", " XCIII ", " XCIV ", " XCV ", " XCVI ", " XCVII ", " XCVIII ", " XCIX ", " C "};
+        return rimNumbers[i];
     }
 
     private static Integer parseRimNumber(String a) { // метод для разбора строки с возможными римскими числами
@@ -142,3 +150,8 @@ public class Main {
         return result;
     }
 }
+/*
+String[] rimNumbers = {
+" I " , , " III " , " IV " , " V " , " VI " , " VII " , " VIII " , " IX " , " X " , " XI " , " XII " , " XIII " , " XIV " , " XV " , " XVI " , " XVII " , " XVIII " , " XIX " , " XX " , " XXI " , " XXII " , " XXIII " , " XXIV " , " XXV " , " XXVI " , " XXVII " , " XXVIII " , " XXIX " , " XXX " , " XXXI " , " XXXII " , " XXXIII " , " XXXIV " , " XXXV " , " XXXVI " , " XXXVII " , " XXXVIII " , " XXXIX " , " XL " , " XLI " , " XLII " , " XLIII " , " XLIV " , " XLV " , " XLVI " , " XLVII " , " XLVIII " , " XLIX " , " L " , " LII " , " LIII " , " LIV " , " LV " , " LVI " , " LVII " , " LVIII " , " LIX " , " LX " , " LXI " , " LXII " , LXIII " , " LXIV " , " LXV " , " LXVI " , " LXVII " , " LXVIII " , " LXIX " " LXX " , " LXXI " , " LXXII " , " LXXIII " , " LXXIV " , " LXXV " , " LXXVI " , " LXXVII " , " LXXVIII " , " LXXIX " , " LXXX “ , " LXXXI " , " LXXXII " , " LXXXIII " , " LXXXIV " , " LXXXV " , " LXXXVI " , " LXXXVII " , " LXXXVIII " , " LXXXIX " , " XC " XCI " , " XCII " , " XCIII " , " XCIV " , " XCV " , " XCVI " , " XCVII " , " XCVIII " , " XCIX " , " C " } ;
+ };*/
+

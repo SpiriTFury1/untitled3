@@ -1,9 +1,9 @@
 public class Data {
     public static Integer CODE_ERROR = -1;
-    public static Integer CODE_ARAB = 1;
+    public static Integer CODE_ARAB = 1; // код для определения арабского числа
     public static Integer CODE_RIM = 2;
     private Integer result; // содержит результатное значение
-    private Integer code; // код ошибки
+    private Integer code; // код
 
     public Integer getResult() {
         return result;
