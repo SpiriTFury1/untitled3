@@ -97,7 +97,7 @@ public class Main {
         result.setCode(Data.CODE_ERROR);
         Integer number;
         try {
-            number = Integer.parseInt(inputStr); // пробуем получить из строки арабское число
+            number = Integer.parseInt(inputStr); // пробуем получить из строки арабское число .
             result.setResult(number); // присваиваем результат число
             result.setCode(Data.CODE_ARAB); // присваиваем код - арабское число
         } catch (NumberFormatException e) { // если получено исключение при парсинге строки
