@@ -1,7 +1,10 @@
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
+
     public static void main(String[] args) {
         boolean x = true;
         while (x) {
@@ -18,10 +21,20 @@ public class Main {
     private static Integer calc(String string) { // string = "10 + 1" "IV + I"
         Integer result = -1; // для ошибки
         String firstNumber, secondNumber, operation;
-        String[] str = string.split(" "); // так введенная строка попадет в массив
-        firstNumber = str[0]; // в этой переменной будет лежать "III" или 3
-        operation = str[1]; // в этой переменной будет лежать лог операция
-        secondNumber = str[2]; // в этой переменной будет лежать "IV" или 4
+        String[] str = new String[0];
+        str = string.split(" "); // так введенная строка попадет в массив
+
+        int strLength = Array.getLength(str); // получаем длину массива
+        if (strLength < 3) {
+            return result; // нет введенных значений
+        } else if (strLength == 3) {
+            firstNumber = str[0]; // в этой переменной будет лежать "III" или 3
+            operation = str[1]; // в этой переменной будет лежать лог операция
+            secondNumber = str[2]; // в этой переменной будет лежать "IV" или 4
+        } else {
+            System.out.println("Ошибка. Введено больше 2-х чисел");
+            return result;
+        }
 
         Data firstData, secondData;
         firstData = parseData(firstNumber); // пробуем спарсить первое число
